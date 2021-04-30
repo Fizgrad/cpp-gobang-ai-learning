@@ -130,7 +130,7 @@ void board::logs(const std::string &filename) {
             }
         out << '\n';
     }
-    out << "Evaluate: B " <<evaluateBlack()<<" W "<<evaluateWhite()<< std::endl<<std::endl;
+    out << "Evaluate: B " <<evaluate(BLACK)<<" W "<<evaluate(WHITE)<< std::endl<<std::endl;
     if (winner != SPACE)
         out << "winner is " << winner << std::endl;
 }
@@ -139,157 +139,17 @@ void board::logs(const std::string &filename) {
 
 int board::evaluateOverall() {
     initCheckedList();
-    int result = evaluateWhite()+evaluateBlack();
-//    for (int i = 0; i < SIZE; ++i) {
-//        for (int j = 0; j < SIZE; ++j) {
-//            if (this->boards[i][j] != SPACE)
-//                for (int k = 0; k < 4; ++k) {
-//                    if (checked[i][j][k])
-//                        continue;
-//                    else {
-//                        // 1 1 1 1 1
-//                        if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
-//                            boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-//                            boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-//                            boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
-//                            result += getValue({i, j}) * 99999999;
-//                            for (int temp = 0; temp <= 4; ++temp)
-//                                setCheckedTrue({i + temp * dx[k], j + temp * dy[k]}, k);
-//                        }
-//                            // 0 1 1 1 1 0
-//                        else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
-//                                 boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-//                                 boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-//                                 getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE &&
-//                                 getValue({i - dx[k], j - dy[k]}) == SPACE) {
-//                            result += getValue({i, j}) * 50000;
-//                            for (int temp = 0; temp <= 3; ++temp)
-//                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-//                        }
-//                            // 0 1 1 1 1 # or # 1 1 1 1 0
-//                        else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
-//                                 boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-//                                 boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-//                                (getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE ||
-//                                 getValue({i - dx[k], j - dy[k]}) == SPACE)) {
-//                            result += getValue({i, j}) * 5000;
-//                            for (int temp = 0; temp <= 3; ++temp)
-//                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-//                        }
-//                            // # 1 1 1 1 #
-//                        else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
-//                                 boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-//                                 getValue({i + 3 * dx[k], j + 3 * dy[k]}) != SPACE &&
-//                                 getValue({i - dx[k], j - dy[k]}) != SPACE) {
-//                            result += getValue({i, j}) * 1000;
-//                            for (int temp = 0; temp <= 3; ++temp)
-//                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-//                        }
-//                            // 1 1 1 0 1
-//                        else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
-//                                 boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-//                                 getValue({i + 3 * dx[k], j + 3 * dy[k]}) == SPACE &&
-//                                 boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
-//                            result += getValue({i, j}) * 1000;
-//                            for (int temp = 0; temp <= 4; ++temp)
-//                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-//                        }
-//                            // 1 1 0 1 1
-//                        else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
-//                                 boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-//                                 getValue({i + 2 * dx[k], j + 2 * dy[k]}) == SPACE &&
-//                                 boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
-//                            result += getValue({i, j}) * 5000;
-//                            for (int temp = 0; temp <= 4; ++temp)
-//                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-//                        }
-//                            // 1 0 1 1 1
-//                        else if (getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-//                                 getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-//                                 getValue({i, j}) == getValue({i + 4 * dx[k], j + 4 * dy[k]}) &&
-//                                 getValue({i + dx[k], j + dy[k]}) == SPACE) {
-//                            result += getValue({i, j}) * 5000;
-//                            for (int temp = 0; temp <= 4; ++temp)
-//                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-//                        }
-//                            // 0 1 0 1 1 0
-//                        else if (getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-//                                 getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-//                                 getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE &&
-//                                 getValue({i + dx[k], j + dy[k]}) == SPACE &&
-//                                 getValue({i - dx[k], j - dy[k]}) == SPACE) {
-//                            result += getValue({i, j}) * 5000;
-//                            for (int temp = 0; temp <= 3; ++temp)
-//                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-//                        }
-//                            // 0 1 1 0 1 0
-//                        else if (getValue({i, j}) == getValue({i + dx[k], j + dy[k]}) &&
-//                                 getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-//                                 getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE &&
-//                                 getValue({i + 2 * dx[k], j + 2 * dy[k]}) == SPACE &&
-//                                 getValue({i - dx[k], j - dy[k]}) == SPACE) {
-//                            result += getValue({i, j}) * 5000;
-//                            for (int temp = 0; temp <= 3; ++temp)
-//                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-//                        }
-//                            // 0 1 1 1 0
-//                        else if (getValue({i, j}) == getValue({i + dx[k], j + dy[k]}) &&
-//                                 getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-//                                 getValue({i + 3 * dx[k], j + 3 * dy[k]}) == SPACE &&
-//                                 getValue({i - dx[k], j - dy[k]}) == SPACE) {
-//                            result += getValue({i, j}) * 5000;
-//                            for (int temp = 0; temp <= 2; ++temp)
-//                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-//                        }
-//                            // 1 1 1 0 0
-//                        else if (getValue({i, j}) == getValue({i + dx[k], j + dy[k]}) &&
-//                                 getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-//                                 getValue({i + 3 * dx[k], j + 3 * dy[k]}) == SPACE &&
-//                                 getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE) {
-//                            result += getValue({i, j}) * 500;
-//                            for (int temp = 0; temp <= 2; ++temp)
-//                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-//                        }
-//                            // 0 0 1 1 1
-//                        else if (getValue({i, j}) == getValue({i + dx[k], j + dy[k]}) &&
-//                                 getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-//                                 getValue({i - dx[k], j - dy[k]}) == SPACE &&
-//                                 getValue({i - 2 * dx[k], j - 2 * dy[k]}) == SPACE) {
-//                            result += getValue({i, j}) * 500;
-//                            for (int temp = 0; temp <= 2; ++temp)
-//                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-//                        }
-//                            // 1 1 0 1 0
-//                        else if (getValue({i, j}) == getValue({i + dx[k], j + dy[k]}) &&
-//                                 getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-//                                 getValue({i + 2 * dx[k], j + 2 * dy[k]}) == SPACE &&
-//                                 getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE) {
-//                            result += getValue({i, j}) * 200;
-//                            for (int temp = 0; temp <= 3; ++temp)
-//                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-//                        }
-//                            // 0 1 1 0
-//                        else if (getValue({i, j}) == getValue({i + dx[k], j + dy[k]}) &&
-//                                 getValue({i + 2 * dx[k], j + 2 * dy[k]}) == SPACE &&
-//                                 getValue({i - dx[k], j - dy[k]}) == SPACE) {
-//                            result += getValue({i, j}) * 50;
-//                            for (int temp = 0; temp <= 1; ++temp)
-//                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-//                        }
-//                    }
-//                }
-//        }
-//    }
+    int result = evaluate(BLACK)+evaluate(WHITE);
 
     return result;
 }
 //negative
-int board::evaluateBlack() {
+int board::evaluate(int role) {
     initCheckedList();
     int result = 0;
     for (int i = 0; i < SIZE; ++i) {
         for (int j = 0; j < SIZE; ++j) {
-            if (this->boards[i][j] == BLACK)
+            if (this->boards[i][j] == role)
                 for (int k = 0; k < 4; ++k) {
                     if (checked[i][j][k])
                         continue;
@@ -300,154 +160,6 @@ int board::evaluateBlack() {
                             boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
                             boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
                             result += getValue({i, j}) * 99999999;
-                            for (int temp = 0; temp <= 4; ++temp)
-                                setCheckedTrue({i + temp * dx[k], j + temp * dy[k]}, k);
-                        }
-                            // 0 1 1 1 1 0
-                        else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
-                                 boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                                 boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-                                 getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE &&
-                                 getValue({i - dx[k], j - dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * 50000;
-                            for (int temp = 0; temp <= 3; ++temp)
-                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-                        }
-                            // 0 1 1 1 1 # or # 1 1 1 1 0
-                        else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
-                                 boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                                 boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-                                 (getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE ||
-                                  getValue({i - dx[k], j - dy[k]}) == SPACE)) {
-                            result += getValue({i, j}) * 5000;
-                            for (int temp = 0; temp <= 3; ++temp)
-                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-                        }
-                            // # 1 1 1 1 #
-                        else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
-                                 boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                                 getValue({i + 3 * dx[k], j + 3 * dy[k]}) != SPACE &&
-                                 getValue({i - dx[k], j - dy[k]}) != SPACE) {
-                            result += getValue({i, j}) * 1000;
-                            for (int temp = 0; temp <= 3; ++temp)
-                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-                        }
-                            // 1 1 1 0 1
-                        else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
-                                 boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                                 getValue({i + 3 * dx[k], j + 3 * dy[k]}) == SPACE &&
-                                 boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
-                            result += getValue({i, j}) * 1000;
-                            for (int temp = 0; temp <= 4; ++temp)
-                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-                        }
-                            // 1 1 0 1 1
-                        else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
-                                 boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-                                 getValue({i + 2 * dx[k], j + 2 * dy[k]}) == SPACE &&
-                                 boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
-                            result += getValue({i, j}) * 5000;
-                            for (int temp = 0; temp <= 4; ++temp)
-                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-                        }
-                            // 1 0 1 1 1
-                        else if (getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                                 getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-                                 getValue({i, j}) == getValue({i + 4 * dx[k], j + 4 * dy[k]}) &&
-                                 getValue({i + dx[k], j + dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * 5000;
-                            for (int temp = 0; temp <= 4; ++temp)
-                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-                        }
-                            // 0 1 0 1 1 0
-                        else if (getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                                 getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-                                 getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE &&
-                                 getValue({i + dx[k], j + dy[k]}) == SPACE &&
-                                 getValue({i - dx[k], j - dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * 5000;
-                            for (int temp = 0; temp <= 3; ++temp)
-                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-                        }
-                            // 0 1 1 0 1 0
-                        else if (getValue({i, j}) == getValue({i + dx[k], j + dy[k]}) &&
-                                 getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-                                 getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE &&
-                                 getValue({i + 2 * dx[k], j + 2 * dy[k]}) == SPACE &&
-                                 getValue({i - dx[k], j - dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * 5000;
-                            for (int temp = 0; temp <= 3; ++temp)
-                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-                        }
-                            // 0 1 1 1 0
-                        else if (getValue({i, j}) == getValue({i + dx[k], j + dy[k]}) &&
-                                 getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                                 getValue({i + 3 * dx[k], j + 3 * dy[k]}) == SPACE &&
-                                 getValue({i - dx[k], j - dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * 5000;
-                            for (int temp = 0; temp <= 2; ++temp)
-                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-                        }
-                            // 1 1 1 0 0
-                        else if (getValue({i, j}) == getValue({i + dx[k], j + dy[k]}) &&
-                                 getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                                 getValue({i + 3 * dx[k], j + 3 * dy[k]}) == SPACE &&
-                                 getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * 500;
-                            for (int temp = 0; temp <= 2; ++temp)
-                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-                        }
-                            // 0 0 1 1 1
-                        else if (getValue({i, j}) == getValue({i + dx[k], j + dy[k]}) &&
-                                 getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                                 getValue({i - dx[k], j - dy[k]}) == SPACE &&
-                                 getValue({i - 2 * dx[k], j - 2 * dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * 500;
-                            for (int temp = 0; temp <= 2; ++temp)
-                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-                        }
-                            // 1 1 0 1 0
-                        else if (getValue({i, j}) == getValue({i + dx[k], j + dy[k]}) &&
-                                 getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-                                 getValue({i + 2 * dx[k], j + 2 * dy[k]}) == SPACE &&
-                                 getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * 200;
-                            for (int temp = 0; temp <= 3; ++temp)
-                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-                        }
-                            // 0 1 1 0
-                        else if (getValue({i, j}) == getValue({i + dx[k], j + dy[k]}) &&
-                                 getValue({i + 2 * dx[k], j + 2 * dy[k]}) == SPACE &&
-                                 getValue({i - dx[k], j - dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * 50;
-                            for (int temp = 0; temp <= 1; ++temp)
-                                setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
-                        }
-                    }
-                }
-        }
-    }
-
-    return result;
-}
-//positive
-int board::evaluateWhite() {
-    initCheckedList();
-    int result = 0;
-    for (int i = 0; i < SIZE; ++i) {
-        for (int j = 0; j < SIZE; ++j) {
-            if (this->boards[i][j] == WHITE)
-                for (int k = 0; k < 4; ++k) {
-                    if (checked[i][j][k])
-                        continue;
-                    else {
-                        // 1 1 1 1 1
-                        if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
-                            boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                            boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-                            boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
-                            result += getValue({i, j}) * 99999999;
-                            //std::cout<<this->getTurns()<<"  Five  "<<i<<" "<<j<<" "<<k<<std::endl;
                             for (int temp = 0; temp <= 4; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + temp * dy[k]}, k);
                         }

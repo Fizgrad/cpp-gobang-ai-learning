@@ -52,9 +52,8 @@ public:
 
     int evaluateOverall();
 
-    int evaluateBlack();
+    int evaluate(int role);
 
-    int evaluateWhite();
 };
 
 #endif //GOBANG_BOARD_H
