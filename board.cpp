@@ -75,8 +75,12 @@ int board::testEnd() {
                         return this->winner;
 
                     }else {
-                        for (int temp = 0; temp <= 4; ++temp)
-                            boards[i][j] ==getValue({i + dx[k], j + dy[k]})?setCheckedTrue({i + temp * dx[k], j + temp * dy[k]}, k):0;
+                       for (int temp = 0; temp <= 4; ++temp)
+                        {
+                            if(boards[i][j]==getValue({i+temp*dx[k],j+temp*dy[k]}))
+                                setCheckedTrue({i+temp*dx[k],j+temp*dy[k]},k);
+                            else break;
+                        }
                     }
                 }
         }
