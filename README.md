@@ -4,3 +4,5 @@ gobang ai using cpp as homework.
 未完成
 
 4月30日 评估函数完成
+
+5月2日 极大极小值搜索出现位置问题 选择不了最优解
