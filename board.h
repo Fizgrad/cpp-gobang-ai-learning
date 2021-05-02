@@ -11,10 +11,10 @@ const int SIZE = 15;
 const int BLACK = -1;
 const int WHITE = 1;
 const int SPACE = 0;
-const int EDGE = 2;//represent access an invalid grid
+const int EDGE = 2;
 
-const int dx[4] = {1, 1, 0, -1};
-const int dy[4] = {0, 1, 1, 1};
+const int dx[4] = {1, 0, 1, 1};
+const int dy[4] = {0, 1, 1, -1};
 
 class board {
 private:
@@ -36,19 +36,19 @@ public:
 
     bool isEnd() const;
 
-    bool place(const coordinate &p);
+    board& place(const coordinate &p);
+
+    board& unplace(const coordinate &p);
 
     int getTurns()const;
 
-    int getValue(const coordinate &p);
+    int getValue(const coordinate &p)const;
 
     int testEnd();
 
     void display();
 
     void logs(const std::string &filename = "out.txt");
-
-    //evaluate unfinished
 
     int evaluateOverall();
 
