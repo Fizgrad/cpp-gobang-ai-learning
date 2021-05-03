@@ -11,34 +11,42 @@
 board game;
 gobangAI ai;
 
-void testAi()
-{
-    std::default_random_engine e;
-    std::uniform_int_distribution<int> u(0,14);    //close
+void aIVSAI() {
     while (!game.isEnd()) {
-        if(game.getTurns()==WHITE)
-            game.place({ u(e), u(e) });
+        ai.findTheBest(game, 2, game.getTurns());
+        game.place(ai.best);
+        game.display();
+        game.testEnd();
+        game.logs();
+    }
+
+}
+
+
+void testAi() {
+    std::default_random_engine e;
+    std::uniform_int_distribution<int> u(0, 14);    //close
+    while (!game.isEnd()) {
+        if (game.getTurns() == WHITE)
+            game.place({u(e), u(e)});
         else {
             ai.findTheBest(game, 2, game.getTurns());
             game.place(ai.best);
         }
-        //game.display();
+        game.display();
         game.testEnd();
         game.logs();
-        std::cout<<game.getTurns()<<": "<<game.evaluateOverall()<<std::endl;
     }
 }
 
-void testEvaluate()
-{
+void testEvaluate() {
     std::default_random_engine e;
-    std::uniform_int_distribution<int> u(0,14);    //close
+    std::uniform_int_distribution<int> u(0, 14);    //close
     game.initBoards();
     while (!game.isEnd()) {
-        game.place({ u(e), u(e) });
+        game.place({u(e), u(e)});
         game.testEnd();
         game.logs();
-        std::cout<<game.getTurns()<<": "<<game.evaluateOverall()<<std::endl;
     }
 }
 
@@ -47,7 +55,7 @@ int main() {
 
     game.initBoards();
 //    testEvaluate();
-    testAi();
+    aIVSAI();
     return 0;
 }
 
