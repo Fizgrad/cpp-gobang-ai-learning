@@ -13,7 +13,7 @@ gobangAI ai;
 
 void aIVSAI() {
     while (!game.isEnd()) {
-        ai.findTheBest(game, 4, game.getTurns());
+        ai.findTheBest(game, 2, game.getTurns());
         game.place(ai.best);
         game.display();
         game.testEnd();

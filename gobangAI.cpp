@@ -72,7 +72,7 @@ int gobangAI::findTheBest(board& b, int deepth, int role) {
             b.unplace(i);
             if(temp>result)
             {
-                std::cout<<"Best changes from "<<best.x<<" "<<best.y<<" " <<result<<" to "<<i.x<<" "<<i.y<<" "<<temp<<std::endl;
+
                 result = temp;
                 this->best = i;
             }
@@ -94,6 +94,7 @@ int gobangAI::findMax(board& b, int deepth) {
                 b.unplace({i,j});
                 if(temp>result)
                 {
+                    b.logs("log.txt");
                     result = temp;
                 }
             }
@@ -115,6 +116,7 @@ int gobangAI::findMin(board& b, int deepth) {
                 b.unplace({i,j});
                 if (temp < result)
                 {
+                    b.logs("log.txt");
                     result = temp;
                 }
             }

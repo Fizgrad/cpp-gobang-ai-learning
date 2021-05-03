@@ -9,7 +9,7 @@
 #include "board.h"
 #include <vector>
 
-const int delta = 3;
+const int delta = 2;
 
 class gobangAI {
 private:
