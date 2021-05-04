@@ -10,11 +10,13 @@
 
 board game;
 gobangAI ai;
+int board::Zobrist[SIZE][SIZE][3] = {};
 
-void aIVSAI() {
+void aiVSai() {
     while (!game.isEnd()) {
-        ai.findTheBest(game, 2, game.getTurns());
+        ai.findTheBest(game, 4, game.getTurns());
         game.place(ai.best);
+        system("cls");
         game.display();
         game.testEnd();
         game.logs();
@@ -23,19 +25,29 @@ void aIVSAI() {
 }
 
 
-void testAi() {
-    std::default_random_engine e;
-    std::uniform_int_distribution<int> u(0, 14);    //close
-    while (!game.isEnd()) {
-        if (game.getTurns() == WHITE)
-            game.place({u(e), u(e)});
-        else {
-            ai.findTheBest(game, 2, game.getTurns());
-            game.place(ai.best);
-        }
+void aiVSpeople() {
+    using namespace std;
+    cout<<"please select your chess, 1 represents white, -1 represent black"<<endl;
+    int roleOfPlayer;
+    cin>>roleOfPlayer;
+    if(roleOfPlayer == BLACK)
+    {
+        cout<<"Please input a coordinate, using decimal"<<endl;
+        int x,y;
+        cin>>x>>y;
+        game.place({x,y});
+    }
+    while(!game.isEnd())
+    {
+        ai.findTheBest(game,4,-roleOfPlayer);
+        game.place(ai.best);
         game.display();
-        game.testEnd();
-        game.logs();
+        do {
+            cout << "Please input a coordinate, using decimal" << endl;
+            int x, y;
+            cin >> x >> y;
+            game.place({x, y});
+        }while(game.getTurns()==roleOfPlayer);
     }
 }
 
@@ -52,10 +64,11 @@ void testEvaluate() {
 
 int main() {
     std::cout << "Hello, World!" << std::endl;
-
+    board::initZobrist();
     game.initBoards();
 //    testEvaluate();
-    aIVSAI();
+    aiVSai();
+//    aiVSpeople();
     return 0;
 }
 

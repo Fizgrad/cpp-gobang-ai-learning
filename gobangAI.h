@@ -8,22 +8,29 @@
 #include "coordinate.h"
 #include "board.h"
 #include <vector>
+#include <map>
 
 const int delta = 2;
 
 class gobangAI {
 private:
     bool worthyCalculating[SIZE][SIZE];//used for local search
+    std::map<int,std::map<int, int>> cache;
 
 public:
 
+    gobangAI();
+
     coordinate best;
+
+    void clearTheCache(int);
+
 
     int findTheBest(board&, int deepth, int role);
 
-    int findMax(board& ,int deepth);
+    int findMax(board& ,int deepth,int alpha, int beta);
 
-    int findMin(board& ,int deepth);
+    int findMin(board& ,int deepth,int alpha, int beta);
 
     void checkWorthyCalculating(const board &);
 

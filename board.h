@@ -22,9 +22,19 @@ private:
     int turns = 0;
     int winner = SPACE;
     bool checked[SIZE][SIZE][4];
+    int hash;
 
 public:
+
+    static int Zobrist[SIZE][SIZE][3];
+
+    static void initZobrist();
+
+    int getKey() const;
+
     board();
+
+    int getRounds() const;
 
     board(const board&);
 
@@ -50,10 +60,13 @@ public:
 
     void logs(const std::string &filename = "out.txt");
 
-    int evaluateOverall();
+    int evaluateOverall(int role);
 
     int evaluate(int role);
 
+    bool findKill(coordinate& p);
+
 };
+
 
 #endif //GOBANG_BOARD_H

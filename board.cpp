@@ -6,22 +6,36 @@
 #include "board.h"
 #include <iostream>
 #include <fstream>
+#include <random>
 
-int board::getTurns() const {return this->turns%2?WHITE:BLACK;}
+int board::getTurns() const { return this->turns % 2 ? WHITE : BLACK; }
+
+int board::getRounds() const {
+    return this->turns;
+}
+
+int board::getKey() const{
+    return this->hash;
+}
 
 board::board() {
     initBoards();
     initCheckedList();
     turns = 0;
     winner = SPACE;
+    for(int i = 0;i<SIZE;++i)
+    {
+        for(int j = 0;j<SIZE;++j)
+            hash ^=Zobrist[i][j][boards[i][j]+1];
+    }
 }
 
-board::board(const board & b) {
-    this->turns=b.turns;
+board::board(const board &b) {
+    this->turns = b.turns;
     this->winner = b.winner;
-    for(int i = 0 ;i<SIZE;++i)
-        for(int j = 0 ;j<SIZE;++j)
-            this->boards[i][j]=b.boards[i][j];
+    for (int i = 0; i < SIZE; ++i)
+        for (int j = 0; j < SIZE; ++j)
+            this->boards[i][j] = b.boards[i][j];
 }
 
 void board::initBoards() {
@@ -49,23 +63,33 @@ bool board::isEnd() const {
 
 //place a chess at given coordinate. the type depends on turns.
 
-board& board::place(const coordinate &p) {
+board &board::place(const coordinate &p) {
+    int temp = getValue(p);
     if (winner == SPACE && p.x < SIZE && p.x >= 0 && p.y >= 0 && p.y < SIZE && boards[p.x][p.y] == SPACE) {
-        this->boards[p.x][p.y] = (turns++ % 2 ? WHITE : BLACK);
+        this->boards[p.x][p.y] = (turns % 2 ? WHITE : BLACK);
+        hash^=Zobrist[p.x][p.y][temp+1]^Zobrist[p.x][p.y][(turns % 2 ? WHITE : BLACK)+1];
+        ++turns;
+    } else {
+        std::cout << "place invalid coordinate" << std::endl;
     }
     return *this;
 }
-board& board::unplace(const coordinate &p) {
+
+board &board::unplace(const coordinate &p) {
     if (winner == SPACE && p.x < SIZE && p.x >= 0 && p.y >= 0 && p.y < SIZE && boards[p.x][p.y] != SPACE) {
+        hash^=Zobrist[p.x][p.y][SPACE+1]^Zobrist[p.x][p.y][boards[p.x][p.y]+1];
         this->boards[p.x][p.y] = SPACE;
         --turns;
+    }
+    else {
+        std::cerr<<"unplace invalid coordinate"<<std::endl;
     }
     return *this;
 }
 
 //to return the value of the chess placed at the given and valid coordinate,if the given coordinate is invalid,
 //return the value of EDGE, AKA 2, which doesn't equal to white or black.
-int board::getValue(const coordinate &p) const{
+int board::getValue(const coordinate &p) const {
     return (p.x >= SIZE || p.y >= SIZE || p.x < 0 || p.y < 0) ? EDGE : this->boards[p.x][p.y];
 }
 
@@ -82,15 +106,14 @@ int board::testEnd() {
                         boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
                         boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
                         boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
-                        std::cout<<"Test end"<<std::endl;
+                        std::cout << "Test end" << std::endl;
                         this->winner = boards[i][j];
                         return this->winner;
 
-                    }else {
-                        for (int temp = 0; temp <= 4; ++temp)
-                        {
-                            if(boards[i][j]==getValue({i+temp*dx[k],j+temp*dy[k]}))
-                                setCheckedTrue({i+temp*dx[k],j+temp*dy[k]},k);
+                    } else {
+                        for (int temp = 0; temp <= 4; ++temp) {
+                            if (boards[i][j] == getValue({i + temp * dx[k], j + temp * dy[k]}))
+                                setCheckedTrue({i + temp * dx[k], j + temp * dy[k]}, k);
                             else break;
                         }
                     }
@@ -99,11 +122,12 @@ int board::testEnd() {
     }
     return SPACE;
 }
+
 //print the board
 void board::display() {
     using std::cout;
-    cout<<turns<<": ";
-    cout<<(turns%2?"B":"W")<<std::endl;
+    cout << turns << ": ";
+    cout << (turns % 2 ? "B" : "W") << std::endl;
     cout << "  ";
     for (int i = 0; i < SIZE; ++i)
         cout << char(i < 10 ? i + '0' : 'A' + i - 10);
@@ -126,15 +150,16 @@ void board::display() {
             }
         cout << '\n';
     }
-    cout << "Evaluate: B " <<evaluate(BLACK)<<" W "<<evaluate(WHITE)<< std::endl<<std::endl;
+    cout << "Evaluate: B " << evaluate(BLACK) << " W " << evaluate(WHITE) << std::endl << std::endl;
     if (winner != SPACE)
         cout << "winner is " << winner << std::endl;
 }
+
 //print the information of each step in a file
 void board::logs(const std::string &filename) {
     std::ofstream out(filename, std::ios::app);
-    out<<turns<<": ";
-    out<<(turns%2?"B":"W")<<std::endl;
+    out << turns << ": ";
+    out << (turns % 2 ? "B" : "W") << std::endl;
     out << "  ";
     for (int i = 0; i < SIZE; ++i)
         out << char(i < 10 ? i + '0' : 'A' + i - 10);
@@ -157,17 +182,18 @@ void board::logs(const std::string &filename) {
             }
         out << '\n';
     }
-    out << "Evaluate: B " <<evaluate(BLACK)<<" W "<<evaluate(WHITE)<< std::endl<<std::endl;
+    out << "Evaluate: B " << evaluate(BLACK) << " W " << evaluate(WHITE) << std::endl << std::endl;
     if (winner != SPACE)
         out << "winner is " << winner << std::endl;
 }
 
 //analyze the whole situation
-int board::evaluateOverall() {
+int board::evaluateOverall(int role) {
     initCheckedList();
-    int result = evaluate(BLACK)+evaluate(WHITE);
+    int result = evaluate(role) + evaluate(-role) + (evaluate(-role)>>3);
     return result;
 }
+
 //white more is better, black less is better
 int board::evaluate(int role) {
     initCheckedList();
@@ -184,7 +210,7 @@ int board::evaluate(int role) {
                             boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
                             boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
                             boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
-                            result += getValue({i, j}) * (100000000);
+                            result += getValue({i, j}) * (INT32_MAX >> 1);
                             for (int temp = 0; temp <= 4; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + temp * dy[k]}, k);
                         }
@@ -204,15 +230,15 @@ int board::evaluate(int role) {
                                  boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
                                  (getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE ||
                                   getValue({i - dx[k], j - dy[k]}) == SPACE)) {
-                            result += getValue({i, j}) * (100000);
+                            result += getValue({i, j}) * (500000);
                             for (int temp = 0; temp <= 3; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
                         }
                             // # 1 1 1 1 #
                         else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
                                  boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                                 boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]})){
-                            result += getValue({i, j}) * (10000);
+                                 boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]})) {
+                            result += getValue({i, j}) * (1000);
                             for (int temp = 0; temp <= 3; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
                         }
@@ -221,7 +247,7 @@ int board::evaluate(int role) {
                                  boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
                                  getValue({i + 3 * dx[k], j + 3 * dy[k]}) == SPACE &&
                                  boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
-                            result += getValue({i, j}) * (91000);
+                            result += getValue({i, j}) * (910000);
                             for (int temp = 0; temp <= 4; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
                         }
@@ -230,7 +256,7 @@ int board::evaluate(int role) {
                                  boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
                                  getValue({i + 2 * dx[k], j + 2 * dy[k]}) == SPACE &&
                                  boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
-                            result += getValue({i, j}) * (90000);
+                            result += getValue({i, j}) * (900000);
                             for (int temp = 0; temp <= 4; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
                         }
@@ -239,7 +265,7 @@ int board::evaluate(int role) {
                                  getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
                                  getValue({i, j}) == getValue({i + 4 * dx[k], j + 4 * dy[k]}) &&
                                  getValue({i + dx[k], j + dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * (90000);
+                            result += getValue({i, j}) * (910000);
                             for (int temp = 0; temp <= 4; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
                         }
@@ -249,7 +275,7 @@ int board::evaluate(int role) {
                                  getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE &&
                                  getValue({i + dx[k], j + dy[k]}) == SPACE &&
                                  getValue({i - dx[k], j - dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * (90000);
+                            result += getValue({i, j}) * (4000);
                             for (int temp = 0; temp <= 3; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
                         }
@@ -259,7 +285,7 @@ int board::evaluate(int role) {
                                  getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE &&
                                  getValue({i + 2 * dx[k], j + 2 * dy[k]}) == SPACE &&
                                  getValue({i - dx[k], j - dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * (90000);
+                            result += getValue({i, j}) * (4000);
                             for (int temp = 0; temp <= 3; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
                         }
@@ -268,25 +294,24 @@ int board::evaluate(int role) {
                                  getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
                                  getValue({i + 3 * dx[k], j + 3 * dy[k]}) == SPACE &&
                                  getValue({i - dx[k], j - dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * 100000;
+                            result += getValue({i, j}) * 5000;
                             for (int temp = 0; temp <= 2; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
                         }
-                            // 1 1 1 0 0
+                            // 1 1 1 0
                         else if (getValue({i, j}) == getValue({i + dx[k], j + dy[k]}) &&
                                  getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                                 getValue({i + 3 * dx[k], j + 3 * dy[k]}) == SPACE &&
-                                 getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * 11000;
+                                 getValue({i + 3 * dx[k], j + 3 * dy[k]}) == SPACE) {
+                            result += getValue({i, j}) * 1100;
                             for (int temp = 0; temp <= 2; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
                         }
-                            // 0 0 1 1 1
+                            //0 1 1 1
                         else if (getValue({i, j}) == getValue({i + dx[k], j + dy[k]}) &&
                                  getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                                 getValue({i - dx[k], j - dy[k]}) == SPACE &&
-                                 getValue({i - 2 * dx[k], j - 2 * dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * 11000;
+                                 getValue({i - dx[k], j - dy[k]}) == SPACE
+                                ) {
+                            result += getValue({i, j}) * 1100;
                             for (int temp = 0; temp <= 2; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
                         }
@@ -295,7 +320,7 @@ int board::evaluate(int role) {
                                  getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
                                  getValue({i + 2 * dx[k], j + 2 * dy[k]}) == SPACE &&
                                  getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * 9000;
+                            result += getValue({i, j}) * 900;
                             for (int temp = 0; temp <= 3; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
                         }
@@ -303,26 +328,26 @@ int board::evaluate(int role) {
                         else if (getValue({i, j}) == getValue({i + dx[k], j + dy[k]}) &&
                                  getValue({i + 2 * dx[k], j + 2 * dy[k]}) == SPACE &&
                                  getValue({i - dx[k], j - dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * (1000);
+                            result += getValue({i, j}) * (100);
                             //std::cout<<turns<<": "<<i<<" "<<j<<" "<<k<<std::endl;
                             for (int temp = 0; temp <= 1; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
                         }
-                        // 0 1 0
+                            // 0 1 0
                         else if (
-                                 getValue({i +   dx[k], j +  dy[k]}) == SPACE &&
-                                 getValue({i - dx[k], j - dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * (5);
+                                getValue({i + dx[k], j + dy[k]}) == SPACE &&
+                                getValue({i - dx[k], j - dy[k]}) == SPACE) {
+                            result += getValue({i, j}) * (1);
                             //std::cout<<turns<<": "<<i<<" "<<j<<" "<<k<<std::endl;
                             for (int temp = 0; temp <= 0; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
                         }
-                        // 0 1 0 1 0
-                        else if (getValue({i, j}) == getValue({i + 2*dx[k], j + 2*dy[k]}) &&
-                                 getValue({i + dx[k], j +  dy[k]}) == SPACE &&
-                                 getValue({i - dx[k], j - dy[k]}) == SPACE&&
-                                getValue({i + 3 * dx[k], j + 3 * dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * (500);
+                            // 0 1 0 1 0
+                        else if (getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
+                                 getValue({i + dx[k], j + dy[k]}) == SPACE &&
+                                 getValue({i - dx[k], j - dy[k]}) == SPACE &&
+                                 getValue({i + 3 * dx[k], j + 3 * dy[k]}) == SPACE) {
+                            result += getValue({i, j}) * (10);
                             //std::cout<<turns<<": "<<i<<" "<<j<<" "<<k<<std::endl;
                             for (int temp = 0; temp <= 2; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
@@ -333,4 +358,74 @@ int board::evaluate(int role) {
     }
 
     return result;
+}
+
+bool board::findKill(coordinate& p) {
+    for (int i = 0; i < SIZE; ++i) {
+        for (int j = 0; j < SIZE; ++j) {
+            if (this->boards[i][j] == -getTurns())
+                for (int k = 0; k < 4; ++k) {
+                    // 0 1 1 1 1 0
+                    if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
+                        boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
+                        boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
+                        getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE &&
+                        getValue({i - dx[k], j - dy[k]}) == SPACE) {
+                        p = {i - dx[k], j - dy[k]};
+                        return true;
+                    }
+                        // 0 1 1 1 1 # or # 1 1 1 1 0
+                    else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
+                             boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
+                             boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
+                             (getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE &&
+                              getValue({i - dx[k], j - dy[k]}) != SPACE)) {
+                        p = {i + 4 * dx[k], j + 4 * dy[k]};
+                        return true;
+                    }
+                    else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
+                             boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
+                             boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
+                             (getValue({i + 4 * dx[k], j + 4 * dy[k]}) != SPACE &&
+                              getValue({i - dx[k], j - dy[k]}) == SPACE)) {
+                        p = {i - dx[k], j - dy[k]};
+                        return true;
+                    }
+                        // 1 1 1 0 1
+                    else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
+                             boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
+                             getValue({i + 3 * dx[k], j + 3 * dy[k]}) == SPACE &&
+                             boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
+                        p={i + 3 * dx[k], j + 3 * dy[k]};
+                        return true;
+                    }
+                        // 1 1 0 1 1
+                    else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
+                             boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
+                             getValue({i + 2 * dx[k], j + 2 * dy[k]}) == SPACE &&
+                             boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
+                        p={i + 2 * dx[k], j + 2 * dy[k]};
+                        return true;
+                    }
+                        // 1 0 1 1 1
+                    else if (getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
+                             getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
+                             getValue({i, j}) == getValue({i + 4 * dx[k], j + 4 * dy[k]}) &&
+                             getValue({i + dx[k], j + dy[k]}) == SPACE) {
+                        p= {i + dx[k], j + dy[k]};
+                        return true;
+                    }
+                }
+        }
+    }
+    return false;
+}
+
+void board::initZobrist() {
+    std::default_random_engine e(0);
+    std::uniform_int_distribution<int> u(INT32_MIN, INT32_MAX);
+    for(auto& i : Zobrist)
+        for(auto& j : i)
+            for(auto& k : j)
+                k = u(e);
 }
