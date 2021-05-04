@@ -3,9 +3,8 @@
 //
 
 #include "gobangAI.h"
-#include <vector>
 
-gobangAI::gobangAI() {
+gobangAI::gobangAI():worthyCalculating(){
     initWorthy();
 }
 
@@ -30,7 +29,7 @@ void gobangAI::checkWorthyCalculating(const board &b) {
 }
 
 void gobangAI::setWorthyCalculatingAroundPoint(const board &b, const coordinate &p) {
-    if (b.getTurns() > 3) {
+    if (b.getRounds() > 3) {
         for (int k = -delta; k <= delta; ++k)
             for (int l = -delta; l <= delta; ++l)
                 setWorthyCalculatingValueAtPoint(b, {p.x + k, p.y + l});
@@ -49,10 +48,12 @@ void gobangAI::setWorthyCalculatingValueAtPoint(const board &b, const coordinate
 //black min, white max
 int gobangAI::findTheBest(board &b, int deepth, int role) {
     clearTheCache(b.getRounds());
-    if (b.findKill(this->best))
-        return 0;
+    initWorthy();
+    bool isFindKill =b.findKill(worthyCalculating);
     std::vector<coordinate> positions;
-    checkWorthyCalculating(b);
+    if(isFindKill){
+    }
+    else checkWorthyCalculating(b);
     for (int i = 0; i < SIZE; ++i)
         for (int j = 0; j < SIZE; ++j)
             if (worthyCalculating[i][j])
@@ -93,9 +94,13 @@ int gobangAI::findTheBest(board &b, int deepth, int role) {
 
 
 int gobangAI::findMax(board &b, int deepth, int alpha, int beta) {
+
     if (deepth <= 0 || b.isEnd()) return b.evaluateOverall(BLACK);
-    checkWorthyCalculating(b);
-//    b.logs("log.txt");
+    initWorthy();
+    bool isFindKill =b.findKill(worthyCalculating);
+    if(isFindKill){
+    }
+    else checkWorthyCalculating(b);
     for (int i = 0; i < SIZE; ++i)
         for (int j = 0; j < SIZE; ++j)
             if (worthyCalculating[i][j]) {
@@ -122,7 +127,11 @@ int gobangAI::findMax(board &b, int deepth, int alpha, int beta) {
 
 int gobangAI::findMin(board &b, int deepth, int alpha, int beta) {
     if (deepth <= 0 || b.isEnd()) return b.evaluateOverall(WHITE);
-    checkWorthyCalculating(b);
+    initWorthy();
+    bool isFindKill =b.findKill(worthyCalculating);
+    if(isFindKill){
+    }
+    else checkWorthyCalculating(b);
     //b.logs("log.txt");
     for (int i = 0; i < SIZE; ++i)
         for (int j = 0; j < SIZE; ++j)

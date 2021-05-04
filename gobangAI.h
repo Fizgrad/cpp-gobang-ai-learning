@@ -9,22 +9,19 @@
 #include "board.h"
 #include <vector>
 #include <map>
-
 const int delta = 2;
 
 class gobangAI {
 private:
-    bool worthyCalculating[SIZE][SIZE];//used for local search
-    std::map<int,std::map<int, int>> cache;
+    bool worthyCalculating[SIZE][SIZE]; //used for local search
+    std::map<int,std::map<int, int>> cache; // cache storing the previous results
 
 public:
+    coordinate best; //the best step
 
     gobangAI();
 
-    coordinate best;
-
     void clearTheCache(int);
-
 
     int findTheBest(board&, int deepth, int role);
 
@@ -40,6 +37,5 @@ public:
 
     void initWorthy();
 };
-
 
 #endif //GOBANG_GOBANGAI_H

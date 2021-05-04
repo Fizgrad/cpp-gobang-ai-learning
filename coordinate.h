@@ -5,8 +5,7 @@
 #ifndef GOBANG_COORDINATE_H
 #define GOBANG_COORDINATE_H
 
-class coordinate {
-public:
+struct coordinate {
     int x, y;
 
     coordinate(int x = 0, int y = 0) : x(x), y(y) {}

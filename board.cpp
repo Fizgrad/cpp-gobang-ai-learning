@@ -7,8 +7,19 @@
 #include <iostream>
 #include <fstream>
 #include <random>
+#include <ctime>
 
-int board::getTurns() const { return this->turns % 2 ? WHITE : BLACK; }
+
+
+int board::Zobrist[SIZE][SIZE][3] = {};
+
+int board::getWinner() {
+    return this->winner;
+}
+
+int board::getTurns() const {
+    return this->turns % 2 ? WHITE : BLACK;
+}
 
 int board::getRounds() const {
     return this->turns;
@@ -18,7 +29,7 @@ int board::getKey() const{
     return this->hash;
 }
 
-board::board() {
+board::board():boards(),checked(),hash(0){
     initBoards();
     initCheckedList();
     turns = 0;
@@ -30,7 +41,7 @@ board::board() {
     }
 }
 
-board::board(const board &b) {
+board::board(const board &b) : boards(),hash(b.getKey()),checked(){
     this->turns = b.turns;
     this->winner = b.winner;
     for (int i = 0; i < SIZE; ++i)
@@ -210,9 +221,7 @@ int board::evaluate(int role) {
                             boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
                             boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
                             boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
-                            result += getValue({i, j}) * (INT32_MAX >> 1);
-                            for (int temp = 0; temp <= 4; ++temp)
-                                setCheckedTrue({i + temp * dx[k], j + temp * dy[k]}, k);
+                            return role*(INT32_MAX>>1);
                         }
                             // 0 1 1 1 1 0
                         else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
@@ -247,7 +256,7 @@ int board::evaluate(int role) {
                                  boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
                                  getValue({i + 3 * dx[k], j + 3 * dy[k]}) == SPACE &&
                                  boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
-                            result += getValue({i, j}) * (910000);
+                            result += getValue({i, j}) * (405000);
                             for (int temp = 0; temp <= 4; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
                         }
@@ -256,7 +265,7 @@ int board::evaluate(int role) {
                                  boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
                                  getValue({i + 2 * dx[k], j + 2 * dy[k]}) == SPACE &&
                                  boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
-                            result += getValue({i, j}) * (900000);
+                            result += getValue({i, j}) * (400000);
                             for (int temp = 0; temp <= 4; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
                         }
@@ -265,7 +274,7 @@ int board::evaluate(int role) {
                                  getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
                                  getValue({i, j}) == getValue({i + 4 * dx[k], j + 4 * dy[k]}) &&
                                  getValue({i + dx[k], j + dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * (910000);
+                            result += getValue({i, j}) * (405000);
                             for (int temp = 0; temp <= 4; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
                         }
@@ -275,7 +284,7 @@ int board::evaluate(int role) {
                                  getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE &&
                                  getValue({i + dx[k], j + dy[k]}) == SPACE &&
                                  getValue({i - dx[k], j - dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * (4000);
+                            result += getValue({i, j}) * (40000);
                             for (int temp = 0; temp <= 3; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
                         }
@@ -285,7 +294,7 @@ int board::evaluate(int role) {
                                  getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE &&
                                  getValue({i + 2 * dx[k], j + 2 * dy[k]}) == SPACE &&
                                  getValue({i - dx[k], j - dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * (4000);
+                            result += getValue({i, j}) * (40000);
                             for (int temp = 0; temp <= 3; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
                         }
@@ -294,7 +303,7 @@ int board::evaluate(int role) {
                                  getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
                                  getValue({i + 3 * dx[k], j + 3 * dy[k]}) == SPACE &&
                                  getValue({i - dx[k], j - dy[k]}) == SPACE) {
-                            result += getValue({i, j}) * 5000;
+                            result += getValue({i, j}) * 50000;
                             for (int temp = 0; temp <= 2; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
                         }
@@ -352,6 +361,7 @@ int board::evaluate(int role) {
                             for (int temp = 0; temp <= 2; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k);
                         }
+
                     }
                 }
         }
@@ -360,10 +370,12 @@ int board::evaluate(int role) {
     return result;
 }
 
-bool board::findKill(coordinate& p) {
+
+
+bool board::findKill(bool a[SIZE][SIZE]) {
     for (int i = 0; i < SIZE; ++i) {
         for (int j = 0; j < SIZE; ++j) {
-            if (this->boards[i][j] == -getTurns())
+            if (this->boards[i][j] != SPACE)
                 for (int k = 0; k < 4; ++k) {
                     // 0 1 1 1 1 0
                     if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
@@ -371,7 +383,8 @@ bool board::findKill(coordinate& p) {
                         boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
                         getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE &&
                         getValue({i - dx[k], j - dy[k]}) == SPACE) {
-                        p = {i - dx[k], j - dy[k]};
+                        a[i + 4 * dx[k]][j + 4 * dy[k]] = true;
+                        a[i - dx[k]][j - dy[k]] = true;
                         return true;
                     }
                         // 0 1 1 1 1 # or # 1 1 1 1 0
@@ -380,7 +393,7 @@ bool board::findKill(coordinate& p) {
                              boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
                              (getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE &&
                               getValue({i - dx[k], j - dy[k]}) != SPACE)) {
-                        p = {i + 4 * dx[k], j + 4 * dy[k]};
+                        a[i + 4 * dx[k]][j + 4 * dy[k]] = true;
                         return true;
                     }
                     else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
@@ -388,7 +401,7 @@ bool board::findKill(coordinate& p) {
                              boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
                              (getValue({i + 4 * dx[k], j + 4 * dy[k]}) != SPACE &&
                               getValue({i - dx[k], j - dy[k]}) == SPACE)) {
-                        p = {i - dx[k], j - dy[k]};
+                        a[i - dx[k]][j - dy[k]] = true;
                         return true;
                     }
                         // 1 1 1 0 1
@@ -396,7 +409,7 @@ bool board::findKill(coordinate& p) {
                              boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
                              getValue({i + 3 * dx[k], j + 3 * dy[k]}) == SPACE &&
                              boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
-                        p={i + 3 * dx[k], j + 3 * dy[k]};
+                        a[i + 3 * dx[k]][j + 3 * dy[k]] = true;
                         return true;
                     }
                         // 1 1 0 1 1
@@ -404,7 +417,7 @@ bool board::findKill(coordinate& p) {
                              boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
                              getValue({i + 2 * dx[k], j + 2 * dy[k]}) == SPACE &&
                              boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
-                        p={i + 2 * dx[k], j + 2 * dy[k]};
+                        a[i + 2 * dx[k]][j + 2 * dy[k]] = true;
                         return true;
                     }
                         // 1 0 1 1 1
@@ -412,7 +425,54 @@ bool board::findKill(coordinate& p) {
                              getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
                              getValue({i, j}) == getValue({i + 4 * dx[k], j + 4 * dy[k]}) &&
                              getValue({i + dx[k], j + dy[k]}) == SPACE) {
-                        p= {i + dx[k], j + dy[k]};
+                        a[i + 1 * dx[k]][j + 1 * dy[k]] = true;
+                        return true;
+                    }
+                    else if (getValue({i, j}) == getValue({i + dx[k], j + dy[k]}) &&
+                             getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
+                             getValue({i + 3 * dx[k], j + 3 * dy[k]}) == SPACE &&
+                             getValue({i - dx[k], j - dy[k]}) == SPACE) {
+                        a[i + 3 * dx[k]][j + 3 * dy[k]] = true;
+                        a[i - dx[k]][j - dy[k]] = true;
+                        return true;
+                    }
+                        // 1 0 1 1 1
+                    else if (getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
+                             getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
+                             getValue({i, j}) == getValue({i + 4 * dx[k], j + 4 * dy[k]}) &&
+                             getValue({i + dx[k], j + dy[k]}) == SPACE) {
+                        a[i + 1 * dx[k]][j + 1 * dy[k]] = true;
+                        return true;
+                    }
+                        // 0 1 0 1 1 0
+                    else if (getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
+                             getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
+                             getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE &&
+                             getValue({i + dx[k], j + dy[k]}) == SPACE &&
+                             getValue({i - dx[k], j - dy[k]}) == SPACE) {
+                        a[i + 1 * dx[k]][j + 1 * dy[k]] = true;
+                        a[i - dx[k]][j - dy[k]] = true;
+                        a[i + 4 * dx[k]][j + 4 * dy[k]] =true;
+                        return true;
+                    }
+                        // 0 1 1 0 1 0
+                    else if (getValue({i, j}) == getValue({i + dx[k], j + dy[k]}) &&
+                             getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
+                             getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE &&
+                             getValue({i + 2 * dx[k], j + 2 * dy[k]}) == SPACE &&
+                             getValue({i - dx[k], j - dy[k]}) == SPACE) {
+                        a[i + 2 * dx[k]][j + 2 * dy[k]] = true;
+                        a[i - dx[k]][j - dy[k]] = true;
+                        a[i + 4 * dx[k]][j + 4 * dy[k]] =true;
+                        return true;
+                    }
+                        // 0 1 1 1 0
+                    else if (getValue({i, j}) == getValue({i + dx[k], j + dy[k]}) &&
+                             getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
+                             getValue({i + 3 * dx[k], j + 3 * dy[k]}) == SPACE &&
+                             getValue({i - dx[k], j - dy[k]}) == SPACE) {
+                        a[i + 3 * dx[k]][j + 3 * dy[k]] = true;
+                        a[i - dx[k]][j - dy[k]] = true;
                         return true;
                     }
                 }
@@ -422,7 +482,7 @@ bool board::findKill(coordinate& p) {
 }
 
 void board::initZobrist() {
-    std::default_random_engine e(0);
+    std::default_random_engine e(std::clock());
     std::uniform_int_distribution<int> u(INT32_MIN, INT32_MAX);
     for(auto& i : Zobrist)
         for(auto& j : i)

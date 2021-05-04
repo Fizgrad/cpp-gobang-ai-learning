@@ -4,9 +4,8 @@
 
 #ifndef GOBANG_BOARD_H
 #define GOBANG_BOARD_H
-#include <iostream>
 #include "coordinate.h"
-
+#include <iostream>
 const int SIZE = 15;
 const int BLACK = -1;
 const int WHITE = 1;
@@ -64,7 +63,9 @@ public:
 
     int evaluate(int role);
 
-    bool findKill(coordinate& p);
+    bool findKill(bool [SIZE][SIZE]);
+
+    int getWinner();
 
 };
 
