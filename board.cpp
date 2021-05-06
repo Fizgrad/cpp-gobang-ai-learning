@@ -372,10 +372,10 @@ int board::evaluate(int role) {
 
 
 
-bool board::findKill(bool a[SIZE][SIZE]) {
+bool board::findKill(bool a[SIZE][SIZE], int role) {
     for (int i = 0; i < SIZE; ++i) {
         for (int j = 0; j < SIZE; ++j) {
-            if (this->boards[i][j] != SPACE)
+            if (this->boards[i][j] == role)
                 for (int k = 0; k < 4; ++k) {
                     // 0 1 1 1 1 0
                     if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
@@ -444,6 +444,8 @@ bool board::findKill(bool a[SIZE][SIZE]) {
                         a[i + 1 * dx[k]][j + 1 * dy[k]] = true;
                         return true;
                     }
+                    else if(role == getTurns())
+                        return false;
                         // 0 1 0 1 1 0
                     else if (getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
                              getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&

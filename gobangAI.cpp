@@ -49,11 +49,16 @@ void gobangAI::setWorthyCalculatingValueAtPoint(const board &b, const coordinate
 int gobangAI::findTheBest(board &b, int deepth, int role) {
     clearTheCache(b.getRounds());
     initWorthy();
-    bool isFindKill =b.findKill(worthyCalculating);
+    bool isFindKillRole =b.findKill(worthyCalculating,role);
     std::vector<coordinate> positions;
-    if(isFindKill){
+    if(isFindKillRole){
     }
-    else checkWorthyCalculating(b);
+    else{
+        initWorthy();
+        if(!b.findKill(worthyCalculating,-role))
+        checkWorthyCalculating(b);
+    }
+
     for (int i = 0; i < SIZE; ++i)
         for (int j = 0; j < SIZE; ++j)
             if (worthyCalculating[i][j])
@@ -97,10 +102,15 @@ int gobangAI::findMax(board &b, int deepth, int alpha, int beta) {
 
     if (deepth <= 0 || b.isEnd()) return b.evaluateOverall(BLACK);
     initWorthy();
-    bool isFindKill =b.findKill(worthyCalculating);
+
+
+    bool isFindKill =b.findKill(worthyCalculating,WHITE);
     if(isFindKill){
     }
-    else checkWorthyCalculating(b);
+    else {
+        if(!b.findKill(worthyCalculating,BLACK));
+        checkWorthyCalculating(b);
+    }
     for (int i = 0; i < SIZE; ++i)
         for (int j = 0; j < SIZE; ++j)
             if (worthyCalculating[i][j]) {
@@ -128,10 +138,12 @@ int gobangAI::findMax(board &b, int deepth, int alpha, int beta) {
 int gobangAI::findMin(board &b, int deepth, int alpha, int beta) {
     if (deepth <= 0 || b.isEnd()) return b.evaluateOverall(WHITE);
     initWorthy();
-    bool isFindKill =b.findKill(worthyCalculating);
+    bool isFindKill =b.findKill(worthyCalculating,BLACK);
     if(isFindKill){
     }
-    else checkWorthyCalculating(b);
+    else {
+        if(!b.findKill(worthyCalculating,WHITE))checkWorthyCalculating(b);
+    }
     //b.logs("log.txt");
     for (int i = 0; i < SIZE; ++i)
         for (int j = 0; j < SIZE; ++j)

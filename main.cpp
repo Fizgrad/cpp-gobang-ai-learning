@@ -25,6 +25,8 @@ void modeOfAiVsAi() {
         game.testEnd();
         game.logs();
     }
+    std::cin.get();
+    std::cin.get();
 }
 
 void modeOfAiVsPeople() {

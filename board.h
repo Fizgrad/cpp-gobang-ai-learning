@@ -63,7 +63,7 @@ public:
 
     int evaluate(int role);
 
-    bool findKill(bool [SIZE][SIZE]);
+    bool findKill(bool [SIZE][SIZE], int role);
 
     int getWinner();
 
