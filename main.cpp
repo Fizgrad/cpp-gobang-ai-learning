@@ -1,7 +1,7 @@
 //
 // Created by Fiz on 4/30/2021.
 //
-
+#include <thread>
 #include <iostream>
 #include <random>
 #include "board.h"
@@ -20,13 +20,15 @@ void modeOfAiVsAi() {
     while (!game.isEnd()) {
         ai.findTheBest(game, difficulty==1?4:2, game.getTurns());
         game.place(ai.best);
+        //std::cout << "Press a key to continue" << std::endl;
+       // std::cin.get();
         system("cls");
         game.display();
         game.testEnd();
         game.logs();
     }
-    std::cin.get();
-    std::cin.get();
+    std::cout<<"Over, press q to continue"<<std::endl;
+    while (std::cin.get() != 'q');
 }
 
 void modeOfAiVsPeople() {
@@ -69,15 +71,14 @@ void modeOfAiVsPeople() {
         else {
             if(game.getWinner()==roleOfPlayer)
             {
-                cout<<"You win, press a key to continue"<<endl;
-                cin.get();
-                cin.get();
+                cout<<"You win, press q to continue"<<endl;
+              
             }
             else {
-                cout<<"You lose, press a key to continue"<<endl;
-                cin.get();
-                cin.get();
+                cout<<"You lose, press q to continue"<<endl;
+              
             }
+            while (cin.get() != 'q');
         }
     }
 }
@@ -86,6 +87,7 @@ int exec() {
     using namespace std;
     board::initZobrist();
     game.initBoards();
+    cout<<"Detected "<<thread::hardware_concurrency()<<" cpus"<<endl;
     cout << "select mode: \n1. AI Vs AI\n2. People Vs AI" << endl;
     int mode;
     cin >> mode;

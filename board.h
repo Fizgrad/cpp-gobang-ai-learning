@@ -20,7 +20,6 @@ private:
     int boards[SIZE][SIZE];
     int turns = 0;
     int winner = SPACE;
-    bool checked[SIZE][SIZE][4];
     int hash;
 
 public:
@@ -39,9 +38,9 @@ public:
 
     void initBoards();
 
-    inline void initCheckedList();
+    inline void initCheckedList(bool (&checked)[SIZE][SIZE][4]);
 
-    inline bool setCheckedTrue(const coordinate &p, int direction);
+    inline bool setCheckedTrue(const coordinate &p, int direction, bool(&checked)[SIZE][SIZE][4]);
 
     bool isEnd() const;
 

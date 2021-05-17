@@ -13,11 +13,12 @@ const int delta = 2;
 
 class gobangAI {
 private:
-    bool worthyCalculating[SIZE][SIZE]; //used for local search
     std::map<int,std::map<int, int>> cache; // cache storing the previous results
 
 public:
     coordinate best; //the best step
+
+    void setWorthyCalculatingValueAtPoint(const board &b, const coordinate &p,bool (&worthyCalculating)[SIZE][SIZE]);
 
     gobangAI();
 
@@ -29,13 +30,11 @@ public:
 
     int findMin(board& ,int deepth,int alpha, int beta);
 
-    void checkWorthyCalculating(const board &);
+    void checkWorthyCalculating(const board &,bool (&worthyCalculating)[SIZE][SIZE]);
 
-    void setWorthyCalculatingValueAtPoint(const board&,const coordinate &);
+    void setWorthyCalculatingAroundPoint(const board&,const coordinate &,bool (&worthyCalculating)[SIZE][SIZE]);
 
-    void setWorthyCalculatingAroundPoint(const board&,const coordinate &);
-
-    void initWorthy();
+    void initWorthy(bool (&worthyCalculating)[SIZE][SIZE]);
 };
 
 #endif //GOBANG_GOBANGAI_H
