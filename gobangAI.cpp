@@ -16,8 +16,7 @@ gobangAI::gobangAI() {
 }
 
 void gobangAI::clearTheCache(int rounds) {
-    if(cache.find(rounds)!=cache.end())
-    this->cache.erase(rounds);
+    this->cache[rounds].clear();
     std::cerr << "clear Zobrist cache " << rounds << std::endl;
 }
 
@@ -178,12 +177,9 @@ int gobangAI::findMax(board &b, int deepth, int alpha, int beta) {
                 b.place({i, j});
                 int temp;
                 int keyValue = b.getKey();
-    
-                if (cache.find(b.getRounds())==cache.end()||cache[b.getRounds()].find(keyValue) == cache[b.getRounds()].end()) {
+                if (cache[b.getRounds()].find(keyValue) == cache[b.getRounds()].end()) {
                     temp = findMin(b, deepth - 1, alpha, beta);
-                    k.lock();
                     cache[b.getRounds()].insert(std::pair<int, int>(keyValue, temp));
-                    k.unlock();
                 } else {
                     temp = cache[b.getRounds()][keyValue];
                 }
@@ -218,9 +214,9 @@ int gobangAI::findMin(board &b, int deepth, int alpha, int beta) {
               
                 if (cache[b.getRounds()].find(keyValue) == cache[b.getRounds()].end()) {
                     temp = findMax(b, deepth - 1, alpha, beta);
-                    k.lock();
+                
                     cache[b.getRounds()].insert(std::pair<int, int>(keyValue, temp));
-                    k.unlock();
+               
                 } else {
                     temp = cache[b.getRounds()][keyValue];
                 }

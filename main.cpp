@@ -19,7 +19,7 @@ void modeOfAiVsAi() {
     } while (difficulty != 1 && difficulty != 2);
     while (!game.isEnd()) {
         game.display();
-        ai.findTheBest(game, difficulty == 1 ? 4 : 2, game.getTurns());
+        ai.findTheBest(game, difficulty == 1 ? 4 : 6, game.getTurns());
         game.place(ai.best);
         //std::cout << "Press a key to continue" << std::endl;
         //std::cin.get();

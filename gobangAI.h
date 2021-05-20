@@ -11,9 +11,11 @@
 #include <map>
 const int delta = 2;
 
+const int maxStep = 225;
+
 class gobangAI {
 private:
-    std::map<int,std::map<int, int>> cache; // cache storing the previous results
+    std::map<int, int> cache[maxStep]; // cache storing the previous results
 
 public:
     coordinate best; //the best step
