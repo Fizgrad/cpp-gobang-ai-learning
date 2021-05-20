@@ -13,3 +13,5 @@ gobang ai using cpp as homework.
 
 5月17日 添加了多线程
 已知bug： 偶尔会卡住不动，有时候过一会就好了
+
+5月21日 有时会报错map/set iterator incompatible, 不知道咋解决
