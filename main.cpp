@@ -21,6 +21,8 @@ void modeOfAiVsAi() {
         game.display();
         ai.findTheBest(game, difficulty == 1 ? 4 : 6, game.getTurns());
         game.place(ai.best);
+        game.logs("out.txt");
+
         //std::cout << "Press a key to continue" << std::endl;
         //std::cin.get();
         system("cls");
@@ -51,8 +53,9 @@ void modeOfAiVsPeople() {
         game.place({ x, y });
     }
     while (!game.isEnd()) {
-        ai.findTheBest(game, difficulty == 1 ? 4 : 2, -roleOfPlayer);
+        ai.findTheBest(game, difficulty == 1 ? 4 : 6, -roleOfPlayer);
         game.place(ai.best);
+        game.logs("out.txt");
         system("cls");
         game.display();
         cout << "AI places " << ai.best.x << "," << ai.best.y << endl;
@@ -62,6 +65,7 @@ void modeOfAiVsPeople() {
                 int x, y;
                 cin >> x >> y;
                 game.place({ x, y });
+                game.logs("out.txt");
             } while (game.getTurns() == roleOfPlayer);
         }
     }

@@ -130,22 +130,11 @@ int gobangAI::findTheBest(board &b, int deepth, int role) {
     int beta = INT32_MAX;
     if (role == BLACK) {
         for (auto &i : positions) {
-            while (!threads.empty() && threads.size() >= std::thread::hardware_concurrency()-1){
-                if (threads.begin()->joinable())
-                    threads.begin()->join();
-                    threads.erase(threads.begin());
-                }
             //std::cerr << "Establish a thread: " << b.getRounds() << std::endl;
             threads.emplace_back(procOfBlack, new aguments(this, b, deepth - 1, &alpha, &beta, i));
         }
     } else if (role == WHITE) {
         for (auto &i : positions) {
-            while (!threads.empty() && threads.size() >= std::thread::hardware_concurrency()-1)
-            {
-                if (threads.begin()->joinable())
-                    threads.begin()->join();
-                    threads.erase(threads.begin());
-            }
             //std::cerr << "Establish a thread: " << b.getRounds() << std::endl;
             threads.emplace_back(procOfWhite, new aguments(this, b, deepth - 1, &alpha, &beta, i));
         }
@@ -179,7 +168,9 @@ int gobangAI::findMax(board &b, int deepth, int alpha, int beta) {
                 int keyValue = b.getKey();
                 if (cache[b.getRounds()].find(keyValue) == cache[b.getRounds()].end()) {
                     temp = findMin(b, deepth - 1, alpha, beta);
+                    k.lock();
                     cache[b.getRounds()].insert(std::pair<int, int>(keyValue, temp));
+                    k.unlock();
                 } else {
                     temp = cache[b.getRounds()][keyValue];
                 }
@@ -211,12 +202,11 @@ int gobangAI::findMin(board &b, int deepth, int alpha, int beta) {
                 b.place({i, j});
                 int temp;
                 int keyValue = b.getKey();
-              
                 if (cache[b.getRounds()].find(keyValue) == cache[b.getRounds()].end()) {
                     temp = findMax(b, deepth - 1, alpha, beta);
-                
+                    k.lock();
                     cache[b.getRounds()].insert(std::pair<int, int>(keyValue, temp));
-               
+                    k.unlock();
                 } else {
                     temp = cache[b.getRounds()][keyValue];
                 }

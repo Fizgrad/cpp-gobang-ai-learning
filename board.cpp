@@ -82,7 +82,10 @@ board &board::place(const coordinate &p) {
         hash^=Zobrist[p.x][p.y][temp+1]^Zobrist[p.x][p.y][(turns % 2 ? WHITE : BLACK)+1];
         ++turns;
     } else {
-        std::cout << "place invalid coordinate" << std::endl;
+        std::cout << "Invalid coordinate to place" << std::endl;
+        std::ofstream out("out.txt", std::ios::app);
+        out << "Try to unplace " << p.x << "," << p.y << " ! INVALID ! MAP BELOW" << std::endl;
+        logs();
     }
     return *this;
 }
@@ -94,7 +97,10 @@ board &board::unplace(const coordinate &p) {
         --turns;
     }
     else {
-        std::cerr<<"unplace invalid coordinate"<<std::endl;
+        std::cerr<<"Invalid coordinate to unplace"<<std::endl;
+        std::ofstream out("out.txt", std::ios::app);
+        out << "Try to unplace " << p.x << "," << p.y << " ! INVALID!" << std::endl;
+        logs();
     }
     return *this;
 }
@@ -122,7 +128,6 @@ int board::testEnd() {
                         std::cout << "Test end" << std::endl;
                         this->winner = boards[i][j];
                         return this->winner;
-
                     } else {
                         for (int temp = 0; temp <= 4; ++temp) {
                             if (boards[i][j] == getValue({i + temp * dx[k], j + temp * dy[k]}))
