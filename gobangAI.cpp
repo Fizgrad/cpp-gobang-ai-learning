@@ -9,12 +9,14 @@
 
 namespace {
     std::mutex m;
+    std::mutex k;
 }
 
 gobangAI::gobangAI() {
 }
 
 void gobangAI::clearTheCache(int rounds) {
+    if(cache.find(rounds)!=cache.end())
     this->cache.erase(rounds);
     std::cerr << "clear Zobrist cache " << rounds << std::endl;
 }
@@ -26,33 +28,27 @@ void gobangAI::initWorthy(bool (&worthyCalculating)[SIZE][SIZE]) {
     }
 }
 
-void gobangAI::checkWorthyCalculating(const board &b, bool (&worthyCalculating)[SIZE][SIZE]) {
+void gobangAI::checkWorthyCalculating(const board& b, bool(&worthyCalculating)[SIZE][SIZE]) {
     initWorthy(worthyCalculating);
     for (int i = 0; i < SIZE; ++i)
         for (int j = 0; j < SIZE; ++j)
-            if (b.getValue({i, j}) == WHITE || b.getValue({i, j}) == BLACK)
-                setWorthyCalculatingAroundPoint(b, {i, j}, worthyCalculating);
+            if (b.getValue({ i, j }) == WHITE || b.getValue({ i, j }) == BLACK) {
+                if (b.getRounds() > 3) {
+                    for (int k = -delta; k <= delta; ++k)
+                        for (int l = -delta; l <= delta; ++l)
+                            if (i + k < SIZE && i + k >= 0 && j + l < SIZE && j + l >= 0 &&
+                                b.getValue({ i + k, j + l }) == SPACE)
+                                worthyCalculating[i + k][j + l] = true;
+                }
+                else {
+                    for (int k = -1; k <= 1; ++k)
+                        for (int l = -1; l <= 1; ++l)
+                            if (i + k < SIZE && i + k >= 0 && j + l < SIZE && j + l >= 0 &&
+                                b.getValue({ i + k, j + l }) == SPACE)
+                                worthyCalculating[i + k][j + l] = true;
+                }
+            }
 }
-
-void
-gobangAI::setWorthyCalculatingAroundPoint(const board &b, const coordinate &p, bool (&worthyCalculating)[SIZE][SIZE]) {
-    if (b.getRounds() > 3) {
-        for (int k = -delta; k <= delta; ++k)
-            for (int l = -delta; l <= delta; ++l)
-                setWorthyCalculatingValueAtPoint(b, {p.x + k, p.y + l}, worthyCalculating);
-    } else {
-        for (int k = -1; k <= 1; ++k)
-            for (int l = -1; l <= 1; ++l)
-                setWorthyCalculatingValueAtPoint(b, {p.x + k, p.y + l}, worthyCalculating);
-    }
-}
-
-void
-gobangAI::setWorthyCalculatingValueAtPoint(const board &b, const coordinate &p, bool (&worthyCalculating)[SIZE][SIZE]) {
-    if (p.x < SIZE && p.x >= 0 && p.y < SIZE && p.y >= 0 && b.getValue(p) == SPACE)
-        worthyCalculating[p.x][p.y] = true;
-}
-
 
 struct aguments {
     gobangAI *ai;
@@ -149,7 +145,7 @@ int gobangAI::findTheBest(board &b, int deepth, int role) {
             {
                 if (threads.begin()->joinable())
                     threads.begin()->join();
-                else threads.erase(threads.begin());
+                    threads.erase(threads.begin());
             }
             //std::cerr << "Establish a thread: " << b.getRounds() << std::endl;
             threads.emplace_back(procOfWhite, new aguments(this, b, deepth - 1, &alpha, &beta, i));
@@ -182,12 +178,16 @@ int gobangAI::findMax(board &b, int deepth, int alpha, int beta) {
                 b.place({i, j});
                 int temp;
                 int keyValue = b.getKey();
+    
                 if (cache.find(b.getRounds())==cache.end()||cache[b.getRounds()].find(keyValue) == cache[b.getRounds()].end()) {
                     temp = findMin(b, deepth - 1, alpha, beta);
+                    k.lock();
                     cache[b.getRounds()].insert(std::pair<int, int>(keyValue, temp));
+                    k.unlock();
                 } else {
                     temp = cache[b.getRounds()][keyValue];
                 }
+       
                 b.unplace({i, j});
                 if (temp > alpha) {
                     alpha = temp;
@@ -208,16 +208,19 @@ int gobangAI::findMin(board &b, int deepth, int alpha, int beta) {
     } else {
         if (!b.findKill(worthyCalculating, WHITE))checkWorthyCalculating(b, worthyCalculating);
     }
-    b.logs("log.txt");
+    //b.logs("log.txt");
     for (int i = 0; i < SIZE; ++i)
         for (int j = 0; j < SIZE; ++j)
             if (worthyCalculating[i][j]) {
                 b.place({i, j});
                 int temp;
                 int keyValue = b.getKey();
+              
                 if (cache[b.getRounds()].find(keyValue) == cache[b.getRounds()].end()) {
                     temp = findMax(b, deepth - 1, alpha, beta);
+                    k.lock();
                     cache[b.getRounds()].insert(std::pair<int, int>(keyValue, temp));
+                    k.unlock();
                 } else {
                     temp = cache[b.getRounds()][keyValue];
                 }

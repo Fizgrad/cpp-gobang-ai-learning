@@ -68,7 +68,8 @@ inline bool board::setCheckedTrue(const coordinate &p, int direction, bool(&chec
     else return false;
 }
 
-bool board::isEnd() const {
+bool board::isEnd() {
+    this->testEnd();
     return this->winner != SPACE || this->turns >= SIZE * SIZE;
 }
 

@@ -42,7 +42,7 @@ public:
 
     inline bool setCheckedTrue(const coordinate &p, int direction, bool(&checked)[SIZE][SIZE][4]);
 
-    bool isEnd() const;
+    bool isEnd();
 
     board& place(const coordinate &p);
 

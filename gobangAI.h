@@ -18,8 +18,6 @@ private:
 public:
     coordinate best; //the best step
 
-    void setWorthyCalculatingValueAtPoint(const board &b, const coordinate &p,bool (&worthyCalculating)[SIZE][SIZE]);
-
     gobangAI();
 
     void clearTheCache(int);
@@ -31,8 +29,6 @@ public:
     int findMin(board& ,int deepth,int alpha, int beta);
 
     void checkWorthyCalculating(const board &,bool (&worthyCalculating)[SIZE][SIZE]);
-
-    void setWorthyCalculatingAroundPoint(const board&,const coordinate &,bool (&worthyCalculating)[SIZE][SIZE]);
 
     void initWorthy(bool (&worthyCalculating)[SIZE][SIZE]);
 };
