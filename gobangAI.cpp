@@ -135,7 +135,7 @@ int gobangAI::findTheBest(board &b, int deepth, int role) {
     int beta = INT32_MAX;
     if (role == BLACK) {
         for (auto &i : positions) {
-            while (!threads.empty() && threads.size() >= std::thread::hardware_concurrency() - 1){
+            while (!threads.empty() && threads.size() >= std::thread::hardware_concurrency()-1){
                 if (threads.begin()->joinable())
                     threads.begin()->join();
                     threads.erase(threads.begin());

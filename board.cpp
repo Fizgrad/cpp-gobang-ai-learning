@@ -397,93 +397,54 @@ bool board::findKill(bool a[SIZE][SIZE], int role) {
             if (this->boards[i][j] == role)
                 for (int k = 0; k < 4; ++k) {
                     // 0 1 1 1 1 0
-                    if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
-                        boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                        boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-                        getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE &&
-                        getValue({i - dx[k], j - dy[k]}) == SPACE) {
+                    if (boards[i][j] == getValue({ i + dx[k], j + dy[k] }) &&
+                        boards[i][j] == getValue({ i + 2 * dx[k], j + 2 * dy[k] }) &&
+                        boards[i][j] == getValue({ i + 3 * dx[k], j + 3 * dy[k] }) &&
+                        getValue({ i + 4 * dx[k], j + 4 * dy[k] }) == SPACE &&
+                        getValue({ i - dx[k], j - dy[k] }) == SPACE) {
                         a[i + 4 * dx[k]][j + 4 * dy[k]] = true;
                         a[i - dx[k]][j - dy[k]] = true;
                         return true;
                     }
-                        // 0 1 1 1 1 # or # 1 1 1 1 0
-                    else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
-                             boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                             boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-                             (getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE &&
-                              getValue({i - dx[k], j - dy[k]}) != SPACE)) {
+                    // 0 1 1 1 1 # or # 1 1 1 1 0
+                    else if (boards[i][j] == getValue({ i + dx[k], j + dy[k] }) &&
+                        boards[i][j] == getValue({ i + 2 * dx[k], j + 2 * dy[k] }) &&
+                        boards[i][j] == getValue({ i + 3 * dx[k], j + 3 * dy[k] }) &&
+                        (getValue({ i + 4 * dx[k], j + 4 * dy[k] }) == SPACE &&
+                            getValue({ i - dx[k], j - dy[k] }) != SPACE)) {
                         a[i + 4 * dx[k]][j + 4 * dy[k]] = true;
                         return true;
                     }
-                    else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
-                             boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                             boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-                             (getValue({i + 4 * dx[k], j + 4 * dy[k]}) != SPACE &&
-                              getValue({i - dx[k], j - dy[k]}) == SPACE)) {
+                    else if (boards[i][j] == getValue({ i + dx[k], j + dy[k] }) &&
+                        boards[i][j] == getValue({ i + 2 * dx[k], j + 2 * dy[k] }) &&
+                        boards[i][j] == getValue({ i + 3 * dx[k], j + 3 * dy[k] }) &&
+                        (getValue({ i + 4 * dx[k], j + 4 * dy[k] }) != SPACE &&
+                            getValue({ i - dx[k], j - dy[k] }) == SPACE)) {
                         a[i - dx[k]][j - dy[k]] = true;
                         return true;
                     }
-                        // 1 1 1 0 1
-                    else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
-                             boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                             getValue({i + 3 * dx[k], j + 3 * dy[k]}) == SPACE &&
-                             boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
+                    // 1 1 1 0 1
+                    else if (boards[i][j] == getValue({ i + dx[k], j + dy[k] }) &&
+                        boards[i][j] == getValue({ i + 2 * dx[k], j + 2 * dy[k] }) &&
+                        getValue({ i + 3 * dx[k], j + 3 * dy[k] }) == SPACE &&
+                        boards[i][j] == getValue({ i + 4 * dx[k], j + 4 * dy[k] })) {
                         a[i + 3 * dx[k]][j + 3 * dy[k]] = true;
                         return true;
                     }
-                        // 1 1 0 1 1
-                    else if (boards[i][j] == getValue({i + dx[k], j + dy[k]}) &&
-                             boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-                             getValue({i + 2 * dx[k], j + 2 * dy[k]}) == SPACE &&
-                             boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
+                    // 1 1 0 1 1
+                    else if (boards[i][j] == getValue({ i + dx[k], j + dy[k] }) &&
+                        boards[i][j] == getValue({ i + 3 * dx[k], j + 3 * dy[k] }) &&
+                        getValue({ i + 2 * dx[k], j + 2 * dy[k] }) == SPACE &&
+                        boards[i][j] == getValue({ i + 4 * dx[k], j + 4 * dy[k] })) {
                         a[i + 2 * dx[k]][j + 2 * dy[k]] = true;
                         return true;
                     }
-                        // 1 0 1 1 1
-                    else if (getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                             getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-                             getValue({i, j}) == getValue({i + 4 * dx[k], j + 4 * dy[k]}) &&
-                             getValue({i + dx[k], j + dy[k]}) == SPACE) {
+                    // 1 0 1 1 1
+                    else if (getValue({ i, j }) == getValue({ i + 2 * dx[k], j + 2 * dy[k] }) &&
+                        getValue({ i, j }) == getValue({ i + 3 * dx[k], j + 3 * dy[k] }) &&
+                        getValue({ i, j }) == getValue({ i + 4 * dx[k], j + 4 * dy[k] }) &&
+                        getValue({ i + dx[k], j + dy[k] }) == SPACE) {
                         a[i + 1 * dx[k]][j + 1 * dy[k]] = true;
-                        return true;
-                    }
-                    // 0 1 1 1 0
-                    else if (getValue({i, j}) == getValue({i + dx[k], j + dy[k]}) &&
-                             getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                             getValue({i + 3 * dx[k], j + 3 * dy[k]}) == SPACE &&
-                             getValue({i - dx[k], j - dy[k]}) == SPACE) {
-                        a[i + 3 * dx[k]][j + 3 * dy[k]] = true;
-                        a[i - dx[k]][j - dy[k]] = true;
-                        return true;
-                    }
-                        // 1 0 1 1 1
-                    else if (getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                             getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-                             getValue({i, j}) == getValue({i + 4 * dx[k], j + 4 * dy[k]}) &&
-                             getValue({i + dx[k], j + dy[k]}) == SPACE) {
-                        a[i + 1 * dx[k]][j + 1 * dy[k]] = true;
-                        return true;
-                    }
-                        // 0 1 0 1 1 0
-                    else if (getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
-                             getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-                             getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE &&
-                             getValue({i + dx[k], j + dy[k]}) == SPACE &&
-                             getValue({i - dx[k], j - dy[k]}) == SPACE) {
-                        a[i + 1 * dx[k]][j + 1 * dy[k]] = true;
-                        a[i - dx[k]][j - dy[k]] = true;
-                        a[i + 4 * dx[k]][j + 4 * dy[k]] =true;
-                        return true;
-                    }
-                        // 0 1 1 0 1 0
-                    else if (getValue({i, j}) == getValue({i + dx[k], j + dy[k]}) &&
-                             getValue({i, j}) == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
-                             getValue({i + 4 * dx[k], j + 4 * dy[k]}) == SPACE &&
-                             getValue({i + 2 * dx[k], j + 2 * dy[k]}) == SPACE &&
-                             getValue({i - dx[k], j - dy[k]}) == SPACE) {
-                        a[i + 2 * dx[k]][j + 2 * dy[k]] = true;
-                        a[i - dx[k]][j - dy[k]] = true;
-                        a[i + 4 * dx[k]][j + 4 * dy[k]] =true;
                         return true;
                     }
                 }
