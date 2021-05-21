@@ -1,6 +1,4 @@
-//
-// Created by Fiz on 4/30/2021.
-//
+#include "board.h"
 
 #include "coordinate.h"
 #include "board.h"
@@ -359,7 +357,7 @@ int board::evaluate(int role) {
                             for (int temp = 0; temp <= 1; ++temp)
                                 setCheckedTrue({i + temp * dx[k], j + dy[k] * temp}, k, checked);
                         }
-                        // 0 1 1 
+                        // 0 1 1
                         else if (getValue({ i, j }) == getValue({ i + dx[k], j + dy[k] }) &&
                         (getValue({ i + 2 * dx[k], j + 2 * dy[k] }) == SPACE ||
                         getValue({ i - dx[k], j - dy[k] }) == SPACE)) {
@@ -368,7 +366,7 @@ int board::evaluate(int role) {
                         for (int temp = 0; temp <= 1; ++temp)
                             setCheckedTrue({ i + temp * dx[k], j + dy[k] * temp }, k, checked);
                         }
-                          
+
                             // 0 1 0 1 0
                         else if (getValue({i, j}) == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
                                  getValue({i + dx[k], j + dy[k]}) == SPACE &&

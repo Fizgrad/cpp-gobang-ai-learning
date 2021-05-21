@@ -1,9 +1,7 @@
-//
-// Created by Fiz on 4/30/2021.
-//
+#ifndef BOARD_H
+#define BOARD_H
 
-#ifndef GOBANG_BOARD_H
-#define GOBANG_BOARD_H
+
 #include "coordinate.h"
 #include <iostream>
 const int SIZE = 15;
@@ -69,4 +67,5 @@ public:
 };
 
 
-#endif //GOBANG_BOARD_H
+
+#endif // BOARD_H

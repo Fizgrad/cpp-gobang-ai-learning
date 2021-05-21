@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>647</width>
+    <height>460</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>610</width>
+    <height>460</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1000</width>
+    <height>460</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>游戏界面</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>623</width>
+      <height>402</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QGraphicsView" name="graphicsView">
+       <property name="minimumSize">
+        <size>
+         <width>400</width>
+         <height>400</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>400</width>
+         <height>400</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QLabel" name="GameMode">
+         <property name="text">
+          <string>当前模式：无</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="GameState">
+         <property name="text">
+          <string>当前状态：游戏未开始</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="AILevel">
+         <property name="text">
+          <string>请在设置界面选择模式</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="aiPlace">
+         <property name="text">
+          <string>如果选择玩家对战电脑模式</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="WhoToPlace">
+         <property name="text">
+          <string>人类不选择黑白将默认为黑</string>
+         </property>
+         <property name="wordWrap">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="AIStartCompute">
+         <property name="text">
+          <string>按此按钮让ai计算一步</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>150</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>647</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>关于</string>
+    </property>
+    <addaction name="actAbout"/>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>设置</string>
+    </property>
+    <addaction name="actionSetPeopleVSAI"/>
+    <addaction name="actSetAIVSAI"/>
+    <addaction name="actSetPeopleVSPeople"/>
+    <addaction name="separator"/>
+    <addaction name="actionSetAILevel4"/>
+    <addaction name="actionSetAILevel2"/>
+    <addaction name="separator"/>
+    <addaction name="actionSetPlayerWhite"/>
+    <addaction name="actionSetPlayerBlack"/>
+   </widget>
+   <widget class="QMenu" name="menu_3">
+    <property name="title">
+     <string>对局</string>
+    </property>
+    <addaction name="actionReStart"/>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_2"/>
+   <addaction name="menu_3"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actAbout">
+   <property name="text">
+    <string>关于这个项目</string>
+   </property>
+   <property name="toolTip">
+    <string>这个程序的相关信息</string>
+   </property>
+  </action>
+  <action name="actSetAIVSAI">
+   <property name="text">
+    <string>设置为电脑对战</string>
+   </property>
+   <property name="toolTip">
+    <string>将模式更改为人机对战</string>
+   </property>
+  </action>
+  <action name="actionSetPeopleVSAI">
+   <property name="text">
+    <string>设置为玩家对战人机</string>
+   </property>
+  </action>
+  <action name="actSetPeopleVSPeople">
+   <property name="text">
+    <string>设置为玩家对战</string>
+   </property>
+   <property name="toolTip">
+    <string>玩家对战</string>
+   </property>
+  </action>
+  <action name="actionSetAILevel4">
+   <property name="text">
+    <string>设置电脑水平为入门</string>
+   </property>
+  </action>
+  <action name="actionSetAILevel2">
+   <property name="text">
+    <string>设置电脑水平为傻子</string>
+   </property>
+  </action>
+  <action name="actionReStart">
+   <property name="text">
+    <string>重新开始</string>
+   </property>
+  </action>
+  <action name="actionSetPlayerWhite">
+   <property name="text">
+    <string>我想执白棋</string>
+   </property>
+  </action>
+  <action name="actionSetPlayerBlack">
+   <property name="text">
+    <string>我想执黑棋</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
