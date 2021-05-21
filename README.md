@@ -1,10 +1,15 @@
 # cpp-gobang-ai-learning
 
 注意在mainwindow.cpp里的mousePressEvent函数中
+
 构造p的时候不同的系统传入的参数不一样：
+
 for windows：
+
 coordinate p((x-12)/24, (y)/24);
+
 for mac os：
+
 coordinate p((x+12)/24, (y)/24);
 
 感谢网友们编写的精美教程。
