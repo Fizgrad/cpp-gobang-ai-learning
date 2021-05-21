@@ -15,3 +15,5 @@ gobang ai using cpp as homework.
 已知bug： 偶尔会卡住不动，有时候过一会就好了
 
 5月21日 有时会报错map/set iterator incompatible, 不知道咋解决
+
+5月21日 bug已修复，目前还未出现此报错
