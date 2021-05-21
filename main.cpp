@@ -19,7 +19,7 @@ void modeOfAiVsAi() {
     } while (difficulty != 1 && difficulty != 2);
     while (!game.isEnd()) {
         game.display();
-        ai.findTheBest(game, difficulty == 1 ? 4 : 6, game.getTurns());
+        ai.findTheBest(game, (difficulty == 1 ? 4 : (game.getRounds()>10?6:4)), game.getTurns());
         game.place(ai.best);
         game.logs("out.txt");
 

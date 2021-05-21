@@ -8,6 +8,11 @@
 #include <fstream>
 #include <random>
 #include <ctime>
+#include <mutex>
+
+namespace {
+    std::mutex l;
+}
 
 int board::Zobrist[SIZE][SIZE][3] = {};
 
@@ -77,30 +82,34 @@ bool board::isEnd() {
 
 board &board::place(const coordinate &p) {
     int temp = getValue(p);
-    if (winner == SPACE && p.x < SIZE && p.x >= 0 && p.y >= 0 && p.y < SIZE && boards[p.x][p.y] == SPACE) {
+    if (p.x < SIZE && p.x >= 0 && p.y >= 0 && p.y < SIZE && boards[p.x][p.y] == SPACE) {
         this->boards[p.x][p.y] = (turns % 2 ? WHITE : BLACK);
         hash^=Zobrist[p.x][p.y][temp+1]^Zobrist[p.x][p.y][(turns % 2 ? WHITE : BLACK)+1];
         ++turns;
     } else {
         std::cout << "Invalid coordinate to place" << std::endl;
-        std::ofstream out("out.txt", std::ios::app);
-        out << "Try to unplace " << p.x << "," << p.y << " ! INVALID ! MAP BELOW" << std::endl;
-        logs();
+        l.lock();
+        std::ofstream out("error.txt", std::ios::app);
+        out << "Try to place " << p.x << "," << p.y << " ! INVALID ! MAP BELOW" << std::endl;
+        logs("error.txt");
+        l.unlock();
     }
     return *this;
 }
 
 board &board::unplace(const coordinate &p) {
-    if (winner == SPACE && p.x < SIZE && p.x >= 0 && p.y >= 0 && p.y < SIZE && boards[p.x][p.y] != SPACE) {
+    if (p.x < SIZE && p.x >= 0 && p.y >= 0 && p.y < SIZE && boards[p.x][p.y] != SPACE) {
         hash^=Zobrist[p.x][p.y][SPACE+1]^Zobrist[p.x][p.y][boards[p.x][p.y]+1];
         this->boards[p.x][p.y] = SPACE;
         --turns;
     }
     else {
         std::cerr<<"Invalid coordinate to unplace"<<std::endl;
-        std::ofstream out("out.txt", std::ios::app);
+        l.lock();
+        std::ofstream out("error.txt", std::ios::app);
         out << "Try to unplace " << p.x << "," << p.y << " ! INVALID!" << std::endl;
-        logs();
+        logs("error.txt");
+        l.unlock();
     }
     return *this;
 }
@@ -125,7 +134,7 @@ int board::testEnd() {
                         boards[i][j] == getValue({i + 2 * dx[k], j + 2 * dy[k]}) &&
                         boards[i][j] == getValue({i + 3 * dx[k], j + 3 * dy[k]}) &&
                         boards[i][j] == getValue({i + 4 * dx[k], j + 4 * dy[k]})) {
-                        std::cout << "Test end" << std::endl;
+                        //std::cout << "Test end" << std::endl;
                         this->winner = boards[i][j];
                         return this->winner;
                     } else {
@@ -138,6 +147,7 @@ int board::testEnd() {
                 }
         }
     }
+    winner = SPACE;
     return SPACE;
 }
 
@@ -207,7 +217,7 @@ void board::logs(const std::string &filename) {
 
 //analyze the whole situation
 int board::evaluateOverall(int role) {
-    int result = evaluate(role) + evaluate(-role)+ evaluate(-role)>>3;
+    int result = evaluate(role) + evaluate(-role)+ (evaluate(-role)>>3);
     return result;
 }
 
