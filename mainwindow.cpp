@@ -68,9 +68,7 @@ void MainWindow::on_actionSetPeopleVSAI_triggered()
     ui->actionSetPlayerBlack->setDisabled(false );
     ui->actionSetPlayerWhite->setDisabled(false );
     this->ui->GameMode->setText("当前模式：玩家对战电脑");
-    if(PlayerChess!=game->getTurns())
-        this->ui->AIStartCompute->setDisabled(false);
-    else this->ui->AIStartCompute->setDisabled(true);
+    this->ui->AIStartCompute->setDisabled(true);
     restart();
     changeGameState();
     QString a = "当前电脑智商：";
@@ -243,9 +241,6 @@ void MainWindow::on_AIStartCompute_clicked()
 {
     if(gameMode==AIVSAI||(gameMode==0&&game->getTurns()!=PlayerChess))
     this->AIComputeOnce();
-    if(gameMode==0&&(game->getTurns()==PlayerChess))
-        ui->AIStartCompute->setDisabled(true);
-
 }
 
 
@@ -257,8 +252,7 @@ void MainWindow::on_actionSetPlayerWhite_triggered()
     if(gameMode==AIVSPEOPLE)
     {
         if(game->getTurns()!=PlayerChess)
-           ui->AIStartCompute->setDisabled(false);
-           else ui->AIStartCompute->setDisabled(true);
+           AIComputeOnce();
     }
 }
 
@@ -270,8 +264,7 @@ void MainWindow::on_actionSetPlayerBlack_triggered()
     ui->actionSetPlayerBlack->setDisabled(true);
     if(gameMode==AIVSPEOPLE){
         if(game->getTurns()!=PlayerChess)
-        ui->AIStartCompute->setDisabled(false);
-        else ui->AIStartCompute->setDisabled(true);
+        AIComputeOnce();
     }
 }
 void MainWindow::changeWhoText()
@@ -294,6 +287,7 @@ void MainWindow::playerPlace(coordinate p)
             changeWhoText();
             gameState = game->isEnd();
             changeGameState();
+            ui->AIStartCompute->setDisabled(true);
         }
         if(gameMode==AIVSPEOPLE&&whoToPlace==PlayerChess)
         {
@@ -303,7 +297,8 @@ void MainWindow::playerPlace(coordinate p)
             changeGameState();
             changeWhoToPlace();
             changeWhoText();
-            ui->AIStartCompute->setDisabled(false);
+            this->AIComputeOnce();
+            ui->AIStartCompute->setDisabled(true);
         }
      }
 }
@@ -317,7 +312,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
         std::cerr<<ptConverted.x()<<"  "<<ptConverted.y()<<std::endl;
         float x = ptConverted.y();
         float y = ptConverted.x();
-        coordinate p( (x+10)/24, (y)/24);
+        coordinate p( (x-12)/24, (y)/24);
         std::cerr<<p.x<<"  "<<p.y<<std::endl;
         if(game->getValue(p)==SPACE)
             playerPlace(p);
