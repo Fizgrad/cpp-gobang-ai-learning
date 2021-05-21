@@ -1,7 +1,15 @@
 # cpp-gobang-ai-learning
-gobang ai using cpp as homework.
 
-完成
+注意在mainwindow.cpp里的mousePressEvent函数中
+构造p的时候不同的系统传入的参数不一样：
+for windows：
+coordinate p((x-12)/24, (y)/24);
+for mac os：
+coordinate p((x+12)/24, (y)/24);
+
+感谢网友们编写的精美教程。
+
+编写过程：
 
 4月30日 评估函数完成
 
@@ -14,3 +22,5 @@ gobang ai using cpp as homework.
 5月17日 添加了多线程
 
 5月21日 使用qt完成图形界面
+
+本人大作业，禁止完全抄袭
