@@ -201,6 +201,7 @@ void MainWindow::AIComputeOnce()
     }else a.append(QChar(ai->best.y+'0'));
     a.append(")");
     ui->aiPlace->setText(a);
+    gameState = game->isEnd();
     changeGameState();
     changeWhoToPlace();
 }
