@@ -1,5 +1,7 @@
 # cpp-gobang-ai-learning
 
+这是一个基于极大极小值搜索算法的五子棋程序\n其中经过了alpha-beta剪枝算法的优化，使用了zobrist哈希算法建立哈希表存储已计算结果的方法减少了重复计算\n加入了多线程计算
+
 注意在mainwindow.cpp里的mousePressEvent函数中
 
 构造p的时候不同的系统传入的参数不一样：
