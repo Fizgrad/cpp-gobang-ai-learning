@@ -5,9 +5,8 @@
 ## Introduction:
 
 
-![](https://img.shields.io/badge/language-c++-orange.svg) ![](https://img.shields.io/badge/language-Qt-orange.svg) ![](https://img.shields.io/github/license/xmuli/chinessChess) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/xmuli/chinessChess)
-
-[![macos-badge](https://github.com/xmuli/chinessChess/workflows/MacOS/badge.svg)](https://github.com/xmuli/chinessChess/workflows/MacOS/badge.svg)  [![win-badge](https://github.com/xmuli/chinessChess/workflows/Windows/badge.svg)](https://github.com/xmuli/chinessChess/workflows/Windows/badge.svg)  [![ubuntu-badge](https://github.com/xmuli/chinessChess/workflows/Ubuntu/badge.svg)](https://github.com/xmuli/chinessChess/workflows/Ubuntu/badge.svg)  ![GitHub All Releases](https://img.shields.io/github/downloads/xmuli/chinessChess/total)  ![GitHub stars](https://img.shields.io/github/stars/xmuli/chinessChess?style=social) ![GitHub forks](https://img.shields.io/github/forks/xmuli/chinessChess?style=social) 
+![](https://img.shields.io/badge/language-c++-orange.svg) ![](https://img.shields.io/badge/language-Qt-orange.svg) ![](https://img.shields.io/github/license/Fizgrad/cpp-gobang-ai-learning) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/Fizgrad/cpp-gobang-ai-learning)
+![GitHub All Releases](https://img.shields.io/github/downloads/Fizgrad/cpp-gobang-ai-learning/total)  ![GitHub stars](https://img.shields.io/github/stars/Fizgrad/cpp-gobang-ai-learning?style=social) ![GitHub forks](https://img.shields.io/github/forks/Fizgrad/cpp-gobang-ai-learning?style=social) 
 
 <br>
 注意在mainwindow.cpp里的mousePressEvent函数中
@@ -23,9 +22,9 @@ for mac os：
 coordinate p((x+12)/24, (y)/24);
 <br>
 
-感谢网友们编写的精美教程。
+### 感谢网友们编写的精美教程。
 
-##编写过程：
+## 编写过程：
 
 4月30日 评估函数完成
 
